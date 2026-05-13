@@ -127,7 +127,7 @@ celerybeat.pid
 *.sage.py
 
 # Environments
-.env
+# .env - Keep .env in repo for MVP (contains API key)
 .venv
 env/
 venv/
@@ -174,3 +174,6 @@ cython_debug/
 
 .DS_Store
 
+
+# Data directory for SQLite database
+data/
