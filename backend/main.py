@@ -1,8 +1,8 @@
 from pathlib import Path
 from typing import Optional
-from fastapi import FastAPI, HTTPException, Cookie, Depends
+from fastapi import FastAPI, HTTPException, Cookie, Depends, Request
 from fastapi.staticfiles import StaticFiles
-from fastapi.responses import JSONResponse
+from fastapi.responses import JSONResponse, FileResponse
 from pydantic import BaseModel
 from sqlalchemy.orm import Session
 from backend.auth import authenticate, create_session, validate_session, delete_session
@@ -223,5 +223,39 @@ async def move_card_endpoint(
     }
 
 
-# Mount static files for Next.js assets
-app.mount("/", StaticFiles(directory=static_dir, html=True), name="static")
+# Mount static files for Next.js assets (CSS, JS, images, etc.)
+app.mount("/_next", StaticFiles(directory=static_dir / "_next"), name="next-static")
+
+# Catch-all route for SPA - serve appropriate HTML for each route
+@app.get("/{full_path:path}")
+async def serve_spa(full_path: str):
+    """Serve the Next.js SPA for all routes except API routes"""
+    # If it's a file with extension (like .ico, .png, .svg, etc.), try to serve it
+    if "." in full_path.split("/")[-1]:
+        file_path = static_dir / full_path
+        if file_path.exists() and file_path.is_file():
+            return FileResponse(file_path)
+    
+    # Map routes to their HTML files
+    route_map = {
+        "": "index.html",  # Root
+        "login": "login.html",
+        "board": "board.html",
+    }
+    
+    # Get the first part of the path (e.g., "login" from "login" or "login/something")
+    route_part = full_path.split("/")[0] if full_path else ""
+    
+    # Find the appropriate HTML file
+    html_file = route_map.get(route_part, "index.html")
+    html_path = static_dir / html_file
+    
+    if html_path.exists():
+        return FileResponse(html_path)
+    
+    # If no match, try 404.html
+    not_found_path = static_dir / "404.html"
+    if not_found_path.exists():
+        return FileResponse(not_found_path, status_code=404)
+    
+    raise HTTPException(status_code=404, detail="Not found")

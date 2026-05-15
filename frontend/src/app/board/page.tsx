@@ -1,13 +1,11 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
 import { KanbanBoard } from "@/components/KanbanBoard";
 
 export default function BoardPage() {
   const [authenticated, setAuthenticated] = useState(false);
   const [loading, setLoading] = useState(true);
-  const router = useRouter();
 
   useEffect(() => {
     const checkAuth = async () => {
@@ -19,17 +17,17 @@ export default function BoardPage() {
         if (response.ok) {
           setAuthenticated(true);
         } else {
-          router.push("/login");
+          window.location.href = "/login";
         }
       } catch (error) {
-        router.push("/login");
+        window.location.href = "/login";
       } finally {
         setLoading(false);
       }
     };
 
     checkAuth();
-  }, [router]);
+  }, []);
 
   const handleLogout = async () => {
     try {
@@ -37,9 +35,10 @@ export default function BoardPage() {
         method: "POST",
         credentials: "include",
       });
-      router.push("/login");
+      window.location.href = "/login";
     } catch (error) {
       console.error("Logout failed:", error);
+      window.location.href = "/login";
     }
   };
 

@@ -1,14 +1,12 @@
 "use client";
 
 import { useState, FormEvent } from "react";
-import { useRouter } from "next/navigation";
 
 export default function LoginPage() {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
-  const router = useRouter();
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
@@ -24,14 +22,14 @@ export default function LoginPage() {
       });
 
       if (response.ok) {
-        router.push("/board");
+        window.location.href = "/board";
       } else {
         const data = await response.json();
         setError(data.detail || "Login failed");
+        setLoading(false);
       }
     } catch (err) {
       setError("Network error. Please try again.");
-    } finally {
       setLoading(false);
     }
   };

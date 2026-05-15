@@ -32,36 +32,36 @@ Create detailed implementation plan with substeps, tests, and success criteria f
 
 ---
 
-## Part 2: Scaffolding
+## Part 2: Scaffolding ✓
 
 ### Objective
 Set up Docker infrastructure, FastAPI backend skeleton, and start/stop scripts. Verify with "hello world" example serving static HTML and making an API call.
 
 ### Tasks
-- [ ] Create backend directory structure
-  - [ ] `backend/main.py` - FastAPI app entry point
-  - [ ] `backend/requirements.txt` - Python dependencies
-  - [ ] `backend/pyproject.toml` - uv configuration
-- [ ] Create Dockerfile (multi-stage)
-  - [ ] Stage 1: Build frontend (Node.js)
-  - [ ] Stage 2: Python runtime with uv
-  - [ ] Copy built frontend to backend static directory
-  - [ ] Expose port 8000
-- [ ] Create docker-compose.yml
-  - [ ] Mount .env file
-  - [ ] Volume for SQLite database persistence
-  - [ ] Port mapping 8000:8000
-- [ ] Create start/stop scripts
-  - [ ] `scripts/start.sh` (Mac/Linux)
-  - [ ] `scripts/start.ps1` (Windows)
-  - [ ] `scripts/stop.sh` (Mac/Linux)
-  - [ ] `scripts/stop.ps1` (Windows)
-- [ ] Implement FastAPI hello world
-  - [ ] GET / - Serve static HTML "Hello World"
-  - [ ] GET /api/health - Return {"status": "ok"}
-- [ ] Write backend tests
-  - [ ] Test health endpoint returns 200
-  - [ ] Test root serves HTML
+- [x] Create backend directory structure
+  - [x] `backend/main.py` - FastAPI app entry point
+  - [x] `backend/requirements.txt` - Python dependencies
+  - [x] `backend/pyproject.toml` - uv configuration
+- [x] Create Dockerfile (multi-stage)
+  - [x] Stage 1: Build frontend (Node.js)
+  - [x] Stage 2: Python runtime with uv
+  - [x] Copy built frontend to backend static directory
+  - [x] Expose port 8000
+- [x] Create docker-compose.yml
+  - [x] Mount .env file
+  - [x] Volume for SQLite database persistence
+  - [x] Port mapping 8000:8000
+- [x] Create start/stop scripts
+  - [x] `scripts/start.sh` (Mac/Linux)
+  - [x] `scripts/start.ps1` (Windows)
+  - [x] `scripts/stop.sh` (Mac/Linux)
+  - [x] `scripts/stop.ps1` (Windows)
+- [x] Implement FastAPI hello world
+  - [x] GET / - Serve static HTML "Hello World"
+  - [x] GET /api/health - Return {"status": "ok"}
+- [x] Write backend tests
+  - [x] Test health endpoint returns 200
+  - [x] Test root serves HTML
 
 ### Functional Tests
 1. Run start script → container starts without errors
@@ -83,30 +83,30 @@ Set up Docker infrastructure, FastAPI backend skeleton, and start/stop scripts. 
 
 ---
 
-## Part 3: Add in Frontend
+## Part 3: Add in Frontend ✓
 
 ### Objective
 Build and serve the NextJS frontend statically from FastAPI, displaying the Kanban board at /. Add comprehensive tests.
 
 ### Tasks
-- [ ] Update Dockerfile
-  - [ ] Add frontend build stage with npm install and build
-  - [ ] Copy frontend/out to backend/static
-- [ ] Update FastAPI to serve static files
-  - [ ] Mount StaticFiles at /
-  - [ ] Serve index.html for root and SPA routes
-- [ ] Update frontend for static export
-  - [ ] Add `output: 'export'` to next.config.ts
-  - [ ] Verify no dynamic features that break static export
-- [ ] Write integration tests
-  - [ ] Test / serves Kanban board HTML
-  - [ ] Test static assets load (CSS, JS)
-  - [ ] Test Kanban board renders correctly
-- [ ] Update frontend e2e tests
-  - [ ] Test drag and drop works
-  - [ ] Test add card works
-  - [ ] Test delete card works
-  - [ ] Test rename column works
+- [x] Update Dockerfile
+  - [x] Add frontend build stage with npm install and build
+  - [x] Copy frontend/out to backend/static
+- [x] Update FastAPI to serve static files
+  - [x] Mount StaticFiles at /
+  - [x] Serve index.html for root and SPA routes
+- [x] Update frontend for static export
+  - [x] Add `output: 'export'` to next.config.ts
+  - [x] Verify no dynamic features that break static export
+- [x] Write integration tests
+  - [x] Test / serves Kanban board HTML
+  - [x] Test static assets load (CSS, JS)
+  - [x] Test Kanban board renders correctly
+- [x] Update frontend e2e tests
+  - [x] Test drag and drop works
+  - [x] Test add card works
+  - [x] Test delete card works
+  - [x] Test rename column works
 
 ### Functional Tests
 1. Visit http://localhost:8000 → see full Kanban board
@@ -131,36 +131,36 @@ Build and serve the NextJS frontend statically from FastAPI, displaying the Kanb
 
 ---
 
-## Part 4: Add Fake User Sign In
+## Part 4: Add Fake User Sign In ✓
 
 ### Objective
 Add authentication flow: login page at /, Kanban at /board after login with hardcoded credentials (user/password), logout functionality.
 
 ### Tasks
-- [ ] Create login page component
-  - [ ] `frontend/src/app/login/page.tsx`
-  - [ ] Form with username and password fields
-  - [ ] Submit button styled per color scheme
-  - [ ] Error message display
-- [ ] Add authentication state management
-  - [ ] Create auth context or simple state
-  - [ ] Store auth token in sessionStorage
-- [ ] Update routing
-  - [ ] / → login page (if not authenticated)
-  - [ ] /board → Kanban board (if authenticated)
-  - [ ] Redirect to login if accessing /board unauthenticated
-- [ ] Add backend auth endpoints
-  - [ ] POST /api/auth/login - Validate credentials, return token
-  - [ ] POST /api/auth/logout - Clear session
-  - [ ] GET /api/auth/me - Verify token
-- [ ] Add logout button to Kanban header
-- [ ] Write auth tests
-  - [ ] Backend: Test login with correct credentials
-  - [ ] Backend: Test login with wrong credentials
-  - [ ] Backend: Test logout
-  - [ ] Frontend: Test login flow
-  - [ ] Frontend: Test logout flow
-  - [ ] Frontend: Test protected route redirect
+- [x] Create login page component
+  - [x] `frontend/src/app/login/page.tsx`
+  - [x] Form with username and password fields
+  - [x] Submit button styled per color scheme
+  - [x] Error message display
+- [x] Add authentication state management
+  - [x] Create auth context or simple state
+  - [x] Store auth token in sessionStorage
+- [x] Update routing
+  - [x] / → login page (if not authenticated)
+  - [x] /board → Kanban board (if authenticated)
+  - [x] Redirect to login if accessing /board unauthenticated
+- [x] Add backend auth endpoints
+  - [x] POST /api/auth/login - Validate credentials, return token
+  - [x] POST /api/auth/logout - Clear session
+  - [x] GET /api/auth/me - Verify token
+- [x] Add logout button to Kanban header
+- [x] Write auth tests
+  - [x] Backend: Test login with correct credentials
+  - [x] Backend: Test login with wrong credentials
+  - [x] Backend: Test logout
+  - [x] Frontend: Test login flow
+  - [x] Frontend: Test logout flow
+  - [x] Frontend: Test protected route redirect
 
 ### Functional Tests
 1. Visit / → see login page
@@ -189,27 +189,27 @@ Add authentication flow: login page at /, Kanban at /board after login with hard
 
 ---
 
-## Part 5: Database Modeling
+## Part 5: Database Modeling ✓
 
 ### Objective
 Design SQLite database schema for users, boards, columns, and cards. Document approach and get user approval.
 
 ### Tasks
-- [ ] Design database schema
-  - [ ] Users table (id, username, password_hash, created_at)
-  - [ ] Boards table (id, user_id, title, created_at, updated_at)
-  - [ ] Columns table (id, board_id, title, position, created_at)
-  - [ ] Cards table (id, column_id, title, details, position, created_at, updated_at)
-- [ ] Create schema documentation
-  - [ ] `docs/DATABASE.md` with ERD and table definitions
-  - [ ] Document relationships and constraints
-  - [ ] Document indexes for performance
-- [ ] Define JSON serialization format
-  - [ ] Board JSON structure matching frontend BoardData type
-  - [ ] Conversion functions between DB and JSON
-- [ ] Create migration approach
-  - [ ] SQLite schema creation script
-  - [ ] Database initialization on first run
+- [x] Design database schema
+  - [x] Users table (id, username, password_hash, created_at)
+  - [x] Boards table (id, user_id, title, created_at, updated_at)
+  - [x] Columns table (id, board_id, title, position, created_at)
+  - [x] Cards table (id, column_id, title, details, position, created_at, updated_at)
+- [x] Create schema documentation
+  - [x] `docs/DATABASE.md` with ERD and table definitions
+  - [x] Document relationships and constraints
+  - [x] Document indexes for performance
+- [x] Define JSON serialization format
+  - [x] Board JSON structure matching frontend BoardData type
+  - [x] Conversion functions between DB and JSON
+- [x] Create migration approach
+  - [x] SQLite schema creation script
+  - [x] Database initialization on first run
 
 ### Documentation Requirements
 - ERD diagram (text-based or ASCII)
@@ -227,37 +227,37 @@ Design SQLite database schema for users, boards, columns, and cards. Document ap
 
 ---
 
-## Part 6: Backend Database Integration
+## Part 6: Backend Database Integration ✓
 
 ### Objective
 Implement database layer with SQLAlchemy, create API routes for CRUD operations on Kanban boards, comprehensive backend tests.
 
 ### Tasks
-- [ ] Set up SQLAlchemy
-  - [ ] `backend/database.py` - Database connection and session
-  - [ ] `backend/models.py` - SQLAlchemy models
-  - [ ] Create database on startup if not exists
-- [ ] Implement database operations
-  - [ ] `backend/crud.py` - CRUD functions
-  - [ ] Get board for user
-  - [ ] Update board (columns and cards)
-  - [ ] Create default board for new user
-- [ ] Create API routes
-  - [ ] GET /api/board - Get user's board as JSON
-  - [ ] PUT /api/board - Update entire board
-  - [ ] PATCH /api/board/columns/{id} - Rename column
-  - [ ] POST /api/board/cards - Add card
-  - [ ] DELETE /api/board/cards/{id} - Delete card
-  - [ ] PATCH /api/board/cards/{id}/move - Move card
-- [ ] Add authentication middleware
-  - [ ] Verify token on protected routes
-  - [ ] Extract user_id from token
-- [ ] Write comprehensive backend tests
-  - [ ] Test database initialization
-  - [ ] Test CRUD operations
-  - [ ] Test API endpoints with authentication
-  - [ ] Test error cases (invalid data, unauthorized)
-  - [ ] Test concurrent updates
+- [x] Set up SQLAlchemy
+  - [x] `backend/database.py` - Database connection and session
+  - [x] `backend/models.py` - SQLAlchemy models
+  - [x] Create database on startup if not exists
+- [x] Implement database operations
+  - [x] `backend/crud.py` - CRUD functions
+  - [x] Get board for user
+  - [x] Update board (columns and cards)
+  - [x] Create default board for new user
+- [x] Create API routes
+  - [x] GET /api/board - Get user's board as JSON
+  - [x] PUT /api/board - Update entire board
+  - [x] PATCH /api/board/columns/{id} - Rename column
+  - [x] POST /api/board/cards - Add card
+  - [x] DELETE /api/board/cards/{id} - Delete card
+  - [x] PATCH /api/board/cards/{id}/move - Move card
+- [x] Add authentication middleware
+  - [x] Verify token on protected routes
+  - [x] Extract user_id from token
+- [x] Write comprehensive backend tests
+  - [x] Test database initialization
+  - [x] Test CRUD operations
+  - [x] Test API endpoints with authentication
+  - [x] Test error cases (invalid data, unauthorized)
+  - [x] Test concurrent updates
 
 ### Functional Tests
 1. Start fresh → database created automatically
@@ -284,38 +284,38 @@ Implement database layer with SQLAlchemy, create API routes for CRUD operations 
 
 ---
 
-## Part 7: Frontend + Backend Integration
+## Part 7: Frontend + Backend Integration ✓
 
 ### Objective
 Connect frontend to backend API, replace local state with API calls, implement optimistic updates, thorough integration testing.
 
 ### Tasks
-- [ ] Create API client
-  - [ ] `frontend/src/lib/api.ts` - API functions
-  - [ ] fetchBoard(), updateBoard(), addCard(), deleteCard(), moveCard()
-  - [ ] Include authentication token in requests
-- [ ] Update KanbanBoard component
-  - [ ] Load board from API on mount
-  - [ ] Replace local state updates with API calls
-  - [ ] Implement optimistic updates for drag operations
-  - [ ] Handle loading and error states
-- [ ] Update authentication flow
-  - [ ] Store token from login response
-  - [ ] Include token in API requests
-  - [ ] Handle 401 responses (redirect to login)
-- [ ] Add error handling
-  - [ ] Display error messages to user
-  - [ ] Retry logic for failed requests
-  - [ ] Rollback optimistic updates on error
-- [ ] Write integration tests
-  - [ ] Test full user flow: login → view board → modify → persist
-  - [ ] Test optimistic updates
-  - [ ] Test error handling
-  - [ ] Test concurrent user actions
-- [ ] Update e2e tests
-  - [ ] Test with real backend
-  - [ ] Test persistence across page refresh
-  - [ ] Test authentication flow
+- [x] Create API client
+  - [x] `frontend/src/lib/api.ts` - API functions
+  - [x] fetchBoard(), updateBoard(), addCard(), deleteCard(), moveCard()
+  - [x] Include authentication token in requests
+- [x] Update KanbanBoard component
+  - [x] Load board from API on mount
+  - [x] Replace local state updates with API calls
+  - [x] Implement optimistic updates for drag operations
+  - [x] Handle loading and error states
+- [x] Update authentication flow
+  - [x] Store token from login response
+  - [x] Include token in API requests
+  - [x] Handle 401 responses (redirect to login)
+- [x] Add error handling
+  - [x] Display error messages to user
+  - [x] Retry logic for failed requests
+  - [x] Rollback optimistic updates on error
+- [x] Write integration tests
+  - [x] Test full user flow: login → view board → modify → persist
+  - [x] Test optimistic updates
+  - [x] Test error handling
+  - [x] Test concurrent user actions
+- [x] Update e2e tests
+  - [x] Test with real backend
+  - [x] Test persistence across page refresh
+  - [x] Test authentication flow
 
 ### Functional Tests
 1. Login → see board loaded from database

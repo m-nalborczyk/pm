@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import {
   DndContext,
   DragOverlay,
@@ -13,11 +13,14 @@ import {
 } from "@dnd-kit/core";
 import { KanbanColumn } from "@/components/KanbanColumn";
 import { KanbanCardPreview } from "@/components/KanbanCardPreview";
-import { createId, initialData, moveCard, type BoardData } from "@/lib/kanban";
+import { moveCard as moveCardLocal, type BoardData } from "@/lib/kanban";
+import * as api from "@/lib/api";
 
 export const KanbanBoard = () => {
-  const [board, setBoard] = useState<BoardData>(() => initialData);
+  const [board, setBoard] = useState<BoardData | null>(null);
   const [activeCardId, setActiveCardId] = useState<string | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   const sensors = useSensors(
     useSensor(PointerSensor, {
@@ -25,71 +28,166 @@ export const KanbanBoard = () => {
     })
   );
 
-  const cardsById = useMemo(() => board.cards, [board.cards]);
+  // Load board data on mount
+  useEffect(() => {
+    const loadBoard = async () => {
+      try {
+        setLoading(true);
+        const data = await api.fetchBoard();
+        setBoard(data);
+        setError(null);
+      } catch (err) {
+        setError(err instanceof Error ? err.message : "Failed to load board");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    loadBoard();
+  }, []);
+
+  const cardsById = useMemo(() => board?.cards || {}, [board?.cards]);
 
   const handleDragStart = (event: DragStartEvent) => {
     setActiveCardId(event.active.id as string);
   };
 
-  const handleDragEnd = (event: DragEndEvent) => {
+  const handleDragEnd = async (event: DragEndEvent) => {
     const { active, over } = event;
     setActiveCardId(null);
 
-    if (!over || active.id === over.id) {
+    if (!over || active.id === over.id || !board) {
       return;
     }
 
-    setBoard((prev) => ({
-      ...prev,
-      columns: moveCard(prev.columns, active.id as string, over.id as string),
-    }));
+    const activeId = active.id as string;
+    const overId = over.id as string;
+
+    // Optimistic update
+    const newColumns = moveCardLocal(board.columns, activeId, overId);
+    const previousBoard = board;
+    setBoard({ ...board, columns: newColumns });
+
+    try {
+      // Find the new column and position
+      const newColumnId = newColumns.find((col) =>
+        col.cardIds.includes(activeId)
+      )?.id;
+      const newPosition = newColumns
+        .find((col) => col.id === newColumnId)
+        ?.cardIds.indexOf(activeId);
+
+      if (newColumnId && newPosition !== undefined) {
+        await api.moveCard(activeId, newColumnId, newPosition);
+      }
+    } catch (err) {
+      // Rollback on error
+      setBoard(previousBoard);
+      setError(err instanceof Error ? err.message : "Failed to move card");
+    }
   };
 
-  const handleRenameColumn = (columnId: string, title: string) => {
-    setBoard((prev) => ({
-      ...prev,
-      columns: prev.columns.map((column) =>
+  const handleRenameColumn = async (columnId: string, title: string) => {
+    if (!board) return;
+
+    // Optimistic update
+    const previousBoard = board;
+    setBoard({
+      ...board,
+      columns: board.columns.map((column) =>
         column.id === columnId ? { ...column, title } : column
       ),
-    }));
+    });
+
+    try {
+      await api.renameColumn(columnId, title);
+    } catch (err) {
+      // Rollback on error
+      setBoard(previousBoard);
+      setError(err instanceof Error ? err.message : "Failed to rename column");
+    }
   };
 
-  const handleAddCard = (columnId: string, title: string, details: string) => {
-    const id = createId("card");
-    setBoard((prev) => ({
-      ...prev,
-      cards: {
-        ...prev.cards,
-        [id]: { id, title, details: details || "No details yet." },
-      },
-      columns: prev.columns.map((column) =>
-        column.id === columnId
-          ? { ...column, cardIds: [...column.cardIds, id] }
-          : column
-      ),
-    }));
-  };
+  const handleAddCard = async (
+    columnId: string,
+    title: string,
+    details: string
+  ) => {
+    if (!board) return;
 
-  const handleDeleteCard = (columnId: string, cardId: string) => {
-    setBoard((prev) => {
-      return {
-        ...prev,
-        cards: Object.fromEntries(
-          Object.entries(prev.cards).filter(([id]) => id !== cardId)
-        ),
-        columns: prev.columns.map((column) =>
+    try {
+      const newCard = await api.addCard(columnId, title, details);
+
+      // Update board with new card
+      setBoard({
+        ...board,
+        cards: {
+          ...board.cards,
+          [newCard.id]: newCard,
+        },
+        columns: board.columns.map((column) =>
           column.id === columnId
-            ? {
-                ...column,
-                cardIds: column.cardIds.filter((id) => id !== cardId),
-              }
+            ? { ...column, cardIds: [...column.cardIds, newCard.id] }
             : column
         ),
-      };
+      });
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Failed to add card");
+    }
+  };
+
+  const handleDeleteCard = async (columnId: string, cardId: string) => {
+    if (!board) return;
+
+    // Optimistic update
+    const previousBoard = board;
+    setBoard({
+      ...board,
+      cards: Object.fromEntries(
+        Object.entries(board.cards).filter(([id]) => id !== cardId)
+      ),
+      columns: board.columns.map((column) =>
+        column.id === columnId
+          ? {
+              ...column,
+              cardIds: column.cardIds.filter((id) => id !== cardId),
+            }
+          : column
+      ),
     });
+
+    try {
+      await api.deleteCard(cardId);
+    } catch (err) {
+      // Rollback on error
+      setBoard(previousBoard);
+      setError(err instanceof Error ? err.message : "Failed to delete card");
+    }
   };
 
   const activeCard = activeCardId ? cardsById[activeCardId] : null;
+
+  if (loading) {
+    return (
+      <div className="flex min-h-screen items-center justify-center">
+        <div className="text-[var(--gray-text)]">Loading board...</div>
+      </div>
+    );
+  }
+
+  if (error && !board) {
+    return (
+      <div className="flex min-h-screen items-center justify-center">
+        <div className="rounded-xl border border-red-200 bg-red-50 px-6 py-4 text-red-600">
+          {error}
+        </div>
+      </div>
+    );
+  }
+
+  if (!board) {
+    return null;
+  }
 
   return (
     <div className="relative overflow-hidden">
@@ -97,6 +195,17 @@ export const KanbanBoard = () => {
       <div className="pointer-events-none absolute bottom-0 right-0 h-[520px] w-[520px] translate-x-1/4 translate-y-1/4 rounded-full bg-[radial-gradient(circle,_rgba(117,57,145,0.18)_0%,_rgba(117,57,145,0.05)_55%,_transparent_75%)]" />
 
       <main className="relative mx-auto flex min-h-screen max-w-[1500px] flex-col gap-10 px-6 pb-16 pt-12">
+        {error && (
+          <div className="rounded-xl border border-red-200 bg-red-50 px-6 py-4 text-sm text-red-600">
+            {error}
+            <button
+              onClick={() => setError(null)}
+              className="ml-4 font-semibold underline"
+            >
+              Dismiss
+            </button>
+          </div>
+        )}
         <header className="flex flex-col gap-6 rounded-[32px] border border-[var(--stroke)] bg-white/80 p-8 shadow-[var(--shadow)] backdrop-blur">
           <div className="flex flex-wrap items-start justify-between gap-6">
             <div>
