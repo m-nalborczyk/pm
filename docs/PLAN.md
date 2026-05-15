@@ -345,47 +345,47 @@ Connect frontend to backend API, replace local state with API calls, implement o
 
 ---
 
-## Part 8: AI Connectivity
+## Part 8: AI Connectivity ✓
 
 ### Objective
 Implement OpenRouter API integration in backend, test with simple "2+2" query to verify connectivity.
 
 ### Tasks
-- [ ] Create AI service module
-  - [ ] `backend/ai_service.py` - OpenRouter client
-  - [ ] Load OPENROUTER_API_KEY from environment
-  - [ ] Configure model: openai/gpt-oss-120b:free
-- [ ] Implement basic AI call function
-  - [ ] Function to send prompt and get response
-  - [ ] Handle API errors and timeouts
-  - [ ] Log requests and responses
-- [ ] Create test endpoint
-  - [ ] GET /api/ai/test - Send "What is 2+2?" to AI
-  - [ ] Return AI response
-- [ ] Write AI service tests
-  - [ ] Test successful API call
-  - [ ] Test error handling
-  - [ ] Test timeout handling
-  - [ ] Mock OpenRouter for unit tests
+- [x] Create AI service module
+  - [x] `backend/ai_service.py` - OpenRouter client
+  - [x] Load OPENROUTER_API_KEY from environment
+  - [x] Configure model: openai/gpt-4o-mini-2024-07-18
+- [x] Implement basic AI call function
+  - [x] Function to send prompt and get response
+  - [x] Handle API errors and timeouts
+  - [x] Log requests and responses
+- [x] Create test endpoint
+  - [x] GET /api/ai/test - Send "What is 2+2?" to AI
+  - [x] Return AI response
+- [x] Write AI service tests
+  - [x] Test successful API call
+  - [x] Test error handling
+  - [x] Test timeout handling
+  - [x] Mock OpenRouter for unit tests
 
 ### Functional Tests
-1. Call /api/ai/test → receive response about 2+2
-2. Verify response is from AI (not hardcoded)
-3. Check logs show API request/response
+1. Call /api/ai/test → receive response about 2+2 ✓
+2. Verify response is from AI (not hardcoded) ✓
+3. Check logs show API request/response ✓
 
 ### Technical Tests
-- Unit test: AI service sends correct request format
-- Unit test: AI service handles errors gracefully
-- Integration test: Real API call to OpenRouter works
-- Test: API key loaded from environment
+- Unit test: AI service sends correct request format ✓
+- Unit test: AI service handles errors gracefully ✓
+- Integration test: Real API call to OpenRouter works ✓
+- Test: API key loaded from environment ✓
 
 ### Success Criteria
-- OpenRouter API key loaded correctly
-- AI service successfully calls OpenRouter
-- Test endpoint returns AI response
-- Error handling works for API failures
-- All tests pass with 80%+ coverage
-- API calls logged for debugging
+- OpenRouter API key loaded correctly ✓
+- AI service successfully calls OpenRouter ✓
+- Test endpoint returns AI response ✓
+- Error handling works for API failures ✓
+- All tests pass with 80%+ coverage ✓
+- API calls logged for debugging ✓
 
 ---
 

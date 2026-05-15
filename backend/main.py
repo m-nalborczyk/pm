@@ -118,6 +118,14 @@ async def get_current_user_info(user_info: dict = Depends(get_current_user)):
     return {"username": user_info["username"]}
 
 
+# AI endpoints
+@app.get("/api/ai/test")
+async def test_ai():
+    """Test AI connectivity with a simple question"""
+    from backend.ai_service import test_ai_connection
+    return test_ai_connection()
+
+
 # Board endpoints
 @app.get("/api/board")
 async def get_board(user_info: dict = Depends(get_current_user), db: Session = Depends(get_db)):
