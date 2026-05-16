@@ -257,4 +257,32 @@ def initialize_default_board(db: Session, user_id: int) -> Board:
     
     return board
 
+
+def add_conversation_message(db: Session, user_id: int, board_id: int, role: str, content: str):
+    """Add a message to conversation history"""
+    from backend.models import Conversation
+    message = Conversation(user_id=user_id, board_id=board_id, role=role, content=content)
+    db.add(message)
+    db.commit()
+    db.refresh(message)
+    return message
+
+
+def get_conversation_history(db: Session, user_id: int, board_id: int, limit: int = 20):
+    """Get recent conversation history for a user's board"""
+    from backend.models import Conversation
+    return db.query(Conversation).filter(
+        Conversation.user_id == user_id,
+        Conversation.board_id == board_id
+    ).order_by(Conversation.created_at.desc()).limit(limit).all()
+
+
+def clear_conversation_history(db: Session, user_id: int, board_id: int):
+    """Clear conversation history for a user's board"""
+    from backend.models import Conversation
+    db.query(Conversation).filter(
+        Conversation.user_id == user_id,
+        Conversation.board_id == board_id
+    ).delete()
+    db.commit()
 # Made with Bob

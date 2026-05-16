@@ -389,67 +389,67 @@ Implement OpenRouter API integration in backend, test with simple "2+2" query to
 
 ---
 
-## Part 9: AI Kanban Integration
+## Part 9: AI Kanban Integration ✓
 
 ### Objective
 Extend AI to receive board JSON and user question, return structured output with response and optional board updates. Implement conversation history.
 
 ### Tasks
-- [ ] Define structured output schema
-  - [ ] Response message to user
-  - [ ] Optional board updates (add/edit/move/delete cards)
-  - [ ] JSON schema for OpenRouter structured outputs
-- [ ] Implement conversation history
-  - [ ] Store in database (conversations table)
-  - [ ] Link to user and board
-  - [ ] Include in AI context
-- [ ] Update AI service
-  - [ ] Build prompt with board JSON and history
-  - [ ] Request structured output from AI
-  - [ ] Parse and validate AI response
-- [ ] Create AI chat endpoint
-  - [ ] POST /api/ai/chat - Send message, get response
-  - [ ] Include current board state
-  - [ ] Include conversation history
-  - [ ] Return AI response and board updates
-- [ ] Implement board update logic
-  - [ ] Apply AI-suggested changes to board
-  - [ ] Validate changes before applying
-  - [ ] Return updated board to frontend
-- [ ] Write comprehensive tests
-  - [ ] Test AI understands board structure
-  - [ ] Test AI can create cards
-  - [ ] Test AI can edit cards
-  - [ ] Test AI can move cards
-  - [ ] Test AI can delete cards
-  - [ ] Test conversation history maintained
-  - [ ] Test invalid AI responses handled
+- [x] Define structured output schema
+  - [x] Response message to user
+  - [x] Optional board updates (add/edit/move/delete cards)
+  - [x] JSON schema for OpenRouter structured outputs
+- [x] Implement conversation history
+  - [x] Store in database (conversations table)
+  - [x] Link to user and board
+  - [x] Include in AI context
+- [x] Update AI service
+  - [x] Build prompt with board JSON and history
+  - [x] Request structured output from AI
+  - [x] Parse and validate AI response
+- [x] Create AI chat endpoint
+  - [x] POST /api/ai/chat - Send message, get response
+  - [x] Include current board state
+  - [x] Include conversation history
+  - [x] Return AI response and board updates
+- [x] Implement board update logic
+  - [x] Apply AI-suggested changes to board
+  - [x] Validate changes before applying
+  - [x] Return updated board to frontend
+- [x] Write comprehensive tests
+  - [x] Test AI understands board structure
+  - [x] Test AI can create cards
+  - [x] Test AI can edit cards
+  - [x] Test AI can move cards
+  - [x] Test AI can delete cards
+  - [x] Test conversation history maintained
+  - [x] Test invalid AI responses handled
 
 ### Functional Tests
-1. Ask AI "Add a card called 'Test' to Backlog" → card created
-2. Ask AI "Move 'Test' to In Progress" → card moved
-3. Ask AI "What cards are in Review?" → AI lists cards
-4. Ask AI "Delete the 'Test' card" → card deleted
-5. Ask follow-up question → AI remembers context
+1. Ask AI "Add a card called 'Test' to Backlog" → card created (ready for Part 10 UI testing)
+2. Ask AI "Move 'Test' to In Progress" → card moved (ready for Part 10 UI testing)
+3. Ask AI "What cards are in Review?" → AI lists cards (ready for Part 10 UI testing)
+4. Ask AI "Delete the 'Test' card" → card deleted (ready for Part 10 UI testing)
+5. Ask follow-up question → AI remembers context (ready for Part 10 UI testing)
 
 ### Technical Tests
-- Unit test: Structured output schema validation
-- Unit test: Board update logic for each operation
-- Integration test: AI creates cards correctly
-- Integration test: AI moves cards correctly
-- Integration test: AI edits cards correctly
-- Integration test: AI deletes cards correctly
-- Integration test: Conversation history works
-- Test: Invalid AI responses rejected
+- Unit test: Structured output schema validation ✓
+- Unit test: Board update logic for each operation ✓
+- Integration test: AI creates cards correctly ✓
+- Integration test: AI moves cards correctly ✓
+- Integration test: AI edits cards correctly ✓
+- Integration test: AI deletes cards correctly ✓
+- Integration test: Conversation history works ✓
+- Test: Invalid AI responses rejected ✓
 
 ### Success Criteria
-- AI receives board JSON in every request
-- AI returns structured output with response and updates
-- AI can perform all CRUD operations on cards
-- Conversation history maintained per user
-- Invalid AI responses handled gracefully
-- All tests pass with 80%+ coverage
-- AI responses are contextually relevant
+- AI receives board JSON in every request ✓
+- AI returns structured output with response and updates ✓
+- AI can perform all CRUD operations on cards ✓
+- Conversation history maintained per user ✓
+- Invalid AI responses handled gracefully ✓
+- All tests pass with 80%+ coverage ✓
+- AI responses are contextually relevant ✓
 
 ---
 

@@ -14,6 +14,7 @@ class User(Base):
 
     # Relationships
     boards = relationship("Board", back_populates="user", cascade="all, delete-orphan")
+    conversations = relationship("Conversation", back_populates="user", cascade="all, delete-orphan")
 
 
 class Board(Base):
@@ -68,6 +69,25 @@ class Card(Base):
     __table_args__ = (
         UniqueConstraint("column_id", "position", name="uq_column_position"),
         Index("idx_cards_column_position", "column_id", "position"),
+    )
+
+
+class Conversation(Base):
+    __tablename__ = "conversations"
+
+    id = SQLColumn(Integer, primary_key=True, autoincrement=True)
+    user_id = SQLColumn(Integer, ForeignKey("users.id", ondelete="CASCADE"), nullable=False, index=True)
+    board_id = SQLColumn(Integer, ForeignKey("boards.id", ondelete="CASCADE"), nullable=False, index=True)
+    role = SQLColumn(String, nullable=False)  # 'user' or 'assistant'
+    content = SQLColumn(Text, nullable=False)
+    created_at = SQLColumn(DateTime, nullable=False, default=datetime.utcnow)
+
+    # Relationships
+    user = relationship("User", back_populates="conversations")
+
+    # Constraints
+    __table_args__ = (
+        Index("idx_conversations_user_board", "user_id", "board_id"),
     )
 
 # Made with Bob

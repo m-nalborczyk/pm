@@ -41,7 +41,7 @@ def get_db():
 
 def init_db():
     """Initialize database - create all tables"""
-    from backend.models import User, Board, Column, Card
+    from backend.models import User, Board, Column, Card, Conversation
     Base.metadata.create_all(bind=engine)
 
 # Made with Bob

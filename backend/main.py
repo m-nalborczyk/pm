@@ -1,5 +1,6 @@
 from pathlib import Path
 from typing import Optional
+import logging
 from fastapi import FastAPI, HTTPException, Cookie, Depends, Request
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import JSONResponse, FileResponse
@@ -12,6 +13,8 @@ from backend.crud import (
     initialize_default_board, get_board_data, update_board_positions,
     update_column_title, create_card, delete_card, move_card
 )
+
+logger = logging.getLogger(__name__)
 
 app = FastAPI(title="Project Management API")
 
@@ -75,6 +78,10 @@ class CardMove(BaseModel):
     position: int
 
 
+class ChatMessage(BaseModel):
+    message: str
+
+
 # Auth endpoints
 @app.get("/api/health")
 async def health():
@@ -123,6 +130,129 @@ async def get_current_user_info(user_info: dict = Depends(get_current_user)):
 async def test_ai():
     """Test AI connectivity with a simple question"""
     from backend.ai_service import test_ai_connection
+
+
+@app.post("/api/ai/chat")
+async def chat_with_ai(
+    chat_message: ChatMessage,
+    user_info: dict = Depends(get_current_user),
+    db: Session = Depends(get_db)
+):
+    """Chat with AI about the Kanban board"""
+    import secrets
+    from backend.ai_service import get_ai_kanban_response, AIServiceError
+    from backend.crud import (
+        get_conversation_history, add_conversation_message,
+        create_card, update_card, move_card, delete_card
+    )
+    
+    # Get user's board
+    board = get_user_board(db, user_info["user_id"])
+    if not board:
+        raise HTTPException(status_code=404, detail="Board not found")
+    
+    # Get board data
+    board_data = get_board_data(db, board.id)
+    
+    # Get conversation history
+    history = get_conversation_history(db, user_info["user_id"], board.id, limit=20)
+    conversation_history = [
+        {"role": msg.role, "content": msg.content}
+        for msg in reversed(history)  # Reverse to get chronological order
+    ]
+    
+    # Save user message
+    add_conversation_message(db, user_info["user_id"], board.id, "user", chat_message.message)
+    
+    try:
+        # Get AI response
+        ai_response = get_ai_kanban_response(
+            board_data,
+            conversation_history,
+            chat_message.message
+        )
+        
+        # Save assistant message
+        add_conversation_message(db, user_info["user_id"], board.id, "assistant", ai_response["message"])
+        
+        # Apply board updates
+        updates_applied = []
+        for update in ai_response.get("board_updates", []):
+            try:
+                operation = update.get("operation")
+                
+                if operation == "add_card":
+                    column_id = update.get("column_id")
+                    title = update.get("title", "Untitled")
+                    details = update.get("details", "")
+                    
+                    # Get current max position in column
+                    from backend.models import Card
+                    max_pos = db.query(Card).filter(Card.column_id == column_id).count()
+                    
+                    # Generate card ID
+                    card_id = f"card-{secrets.token_hex(6)}"
+                    
+                    card = create_card(db, card_id, column_id, title, details, max_pos)
+                    updates_applied.append({
+                        "operation": "add_card",
+                        "card_id": card.id,
+                        "column_id": column_id
+                    })
+                
+                elif operation == "edit_card":
+                    card_id = update.get("card_id")
+                    title = update.get("title")
+                    details = update.get("details")
+                    
+                    card = update_card(db, card_id, title, details)
+                    if card:
+                        updates_applied.append({
+                            "operation": "edit_card",
+                            "card_id": card_id
+                        })
+                
+                elif operation == "move_card":
+                    card_id = update.get("card_id")
+                    column_id = update.get("column_id")
+                    position = update.get("position", 0)
+                    
+                    card = move_card(db, card_id, column_id, position)
+                    if card:
+                        updates_applied.append({
+                            "operation": "move_card",
+                            "card_id": card_id,
+                            "column_id": column_id
+                        })
+                
+                elif operation == "delete_card":
+                    card_id = update.get("card_id")
+                    
+                    success = delete_card(db, card_id)
+                    if success:
+                        updates_applied.append({
+                            "operation": "delete_card",
+                            "card_id": card_id
+                        })
+            
+            except Exception as e:
+                logger.error(f"Failed to apply update {update}: {e}")
+                # Continue with other updates
+        
+        # Get updated board data
+        updated_board_data = get_board_data(db, board.id)
+        
+        return {
+            "message": ai_response["message"],
+            "board_updates": updates_applied,
+            "board": updated_board_data
+        }
+    
+    except AIServiceError as e:
+        raise HTTPException(status_code=500, detail=f"AI service error: {str(e)}")
+    except Exception as e:
+        logger.error(f"Chat endpoint error: {e}")
+        raise HTTPException(status_code=500, detail="Internal server error")
     return test_ai_connection()
 
 
