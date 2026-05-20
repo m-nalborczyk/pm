@@ -51,12 +51,12 @@ AI_RESPONSE_SCHEMA = {
                 "properties": {
                     "operation": {
                         "type": "string",
-                        "enum": ["add_card", "edit_card", "move_card", "delete_card"],
+                        "enum": ["add_card", "edit_card", "move_card", "delete_card", "rename_column", "add_column"],
                         "description": "Type of operation to perform"
                     },
                     "column_id": {
                         "type": "string",
-                        "description": "Column ID (for add_card, move_card)"
+                        "description": "Column ID (for add_card, move_card, rename_column)"
                     },
                     "card_id": {
                         "type": "string",
@@ -64,7 +64,7 @@ AI_RESPONSE_SCHEMA = {
                     },
                     "title": {
                         "type": "string",
-                        "description": "Card title (for add_card, edit_card)"
+                        "description": "Card/Column title (for add_card, edit_card, rename_column, add_column)"
                     },
                     "details": {
                         "type": "string",
@@ -72,7 +72,7 @@ AI_RESPONSE_SCHEMA = {
                     },
                     "position": {
                         "type": "integer",
-                        "description": "Card position in column (for move_card)"
+                        "description": "Card/Column position (for move_card, add_column)"
                     }
                 },
                 "required": ["operation"]
@@ -168,7 +168,7 @@ Current Board State:
 2. "board_updates": An array of operations to perform (can be empty)
 
 Each operation should have:
-- "operation": one of "add_card", "edit_card", "move_card", "delete_card"
+- "operation": one of "add_card", "edit_card", "move_card", "delete_card", "rename_column", "add_column"
 - Additional fields based on operation type
 
 Examples:
@@ -176,6 +176,10 @@ Examples:
 - Edit card: {"operation": "edit_card", "card_id": "card-1", "title": "Updated title", "details": "Updated details"}
 - Move card: {"operation": "move_card", "card_id": "card-1", "column_id": "col-progress", "position": 0}
 - Delete card: {"operation": "delete_card", "card_id": "card-1"}
+- Rename column: {"operation": "rename_column", "column_id": "col-backlog", "title": "New Column Name"}
+- Add column: {"operation": "add_column", "title": "New Column", "position": 3}
+
+Note: The board has fixed columns that can be renamed but not added/removed in the MVP. If user asks to add a column, explain this limitation and offer to rename an existing column instead.
 
 Respond ONLY with valid JSON, no additional text."""
     

@@ -110,4 +110,26 @@ export async function moveCard(
   return handleResponse<Card>(response);
 }
 
+export type AiChatResponse = {
+  message: string;
+  board_updates: Array<{
+    operation: string;
+    card_id?: string;
+    column_id?: string;
+  }>;
+  board: BoardData;
+};
+
+export async function sendChatMessage(
+  message: string
+): Promise<AiChatResponse> {
+  const response = await fetch(`${API_BASE}/ai/chat`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    credentials: "include",
+    body: JSON.stringify({ message }),
+  });
+  return handleResponse<AiChatResponse>(response);
+}
+
 // Made with Bob

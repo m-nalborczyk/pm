@@ -13,6 +13,7 @@ import {
 } from "@dnd-kit/core";
 import { KanbanColumn } from "@/components/KanbanColumn";
 import { KanbanCardPreview } from "@/components/KanbanCardPreview";
+import { ChatSidebar } from "@/components/ChatSidebar";
 import { moveCard as moveCardLocal, type BoardData } from "@/lib/kanban";
 import * as api from "@/lib/api";
 
@@ -21,6 +22,7 @@ export const KanbanBoard = () => {
   const [activeCardId, setActiveCardId] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [chatOpen, setChatOpen] = useState(false);
 
   const sensors = useSensors(
     useSensor(PointerSensor, {
@@ -165,6 +167,16 @@ export const KanbanBoard = () => {
     }
   };
 
+  const handleBoardUpdate = async () => {
+    try {
+      const data = await api.fetchBoard();
+      setBoard(data);
+      setError(null);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Failed to refresh board");
+    }
+  };
+
   const activeCard = activeCardId ? cardsById[activeCardId] : null;
 
   if (loading) {
@@ -220,13 +232,35 @@ export const KanbanBoard = () => {
                 and capture quick notes without getting buried in settings.
               </p>
             </div>
-            <div className="rounded-2xl border border-[var(--stroke)] bg-[var(--surface)] px-5 py-4">
-              <p className="text-xs font-semibold uppercase tracking-[0.25em] text-[var(--gray-text)]">
-                Focus
-              </p>
-              <p className="mt-2 text-lg font-semibold text-[var(--primary-blue)]">
-                One board. Five columns. Zero clutter.
-              </p>
+            <div className="flex gap-4">
+              <div className="rounded-2xl border border-[var(--stroke)] bg-[var(--surface)] px-5 py-4">
+                <p className="text-xs font-semibold uppercase tracking-[0.25em] text-[var(--gray-text)]">
+                  Focus
+                </p>
+                <p className="mt-2 text-lg font-semibold text-[var(--primary-blue)]">
+                  One board. Five columns. Zero clutter.
+                </p>
+              </div>
+              <button
+                onClick={() => setChatOpen(true)}
+                className="flex items-center gap-2 rounded-2xl border border-[var(--stroke)] bg-gradient-to-r from-[var(--primary-blue)] to-[var(--secondary-purple)] px-6 py-4 text-white shadow-lg transition hover:shadow-xl"
+                data-testid="chat-toggle-button"
+              >
+                <svg
+                  className="h-5 w-5"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z"
+                  />
+                </svg>
+                <span className="text-sm font-semibold">AI Chat</span>
+              </button>
             </div>
           </div>
           <div className="flex flex-wrap items-center gap-4">
@@ -269,6 +303,12 @@ export const KanbanBoard = () => {
           </DragOverlay>
         </DndContext>
       </main>
+
+      <ChatSidebar
+        isOpen={chatOpen}
+        onClose={() => setChatOpen(false)}
+        onBoardUpdate={handleBoardUpdate}
+      />
     </div>
   );
 };

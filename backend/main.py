@@ -234,6 +234,19 @@ async def chat_with_ai(
                             "operation": "delete_card",
                             "card_id": card_id
                         })
+                
+                elif operation == "rename_column":
+                    column_id = update.get("column_id")
+                    title = update.get("title")
+                    
+                    if column_id and title:
+                        column = update_column_title(db, column_id, title)
+                        if column:
+                            updates_applied.append({
+                                "operation": "rename_column",
+                                "column_id": column_id,
+                                "title": title
+                            })
             
             except Exception as e:
                 logger.error(f"Failed to apply update {update}: {e}")
